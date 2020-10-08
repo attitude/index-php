@@ -1,0 +1,16 @@
+{
+    "name": "attitude/index-php",
+    "description": "Walks tree and generates index.php [devtool]",
+    "type": "devtool",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Martin Adamko",
+            "email": "martinadamko.sk@gmail.com"
+        }
+    ],
+    "autoload": {
+        "files": ["index.php"]
+    },
+    "require": {}
+}
