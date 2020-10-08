@@ -65,7 +65,7 @@ if (
 function boolify($value) {
   if (is_string($value)) { $value = strtolower($value); }
 
-  if (in_array($value, ['no', 'false', 0, '0', 'n', 'null', null], true)) {
+  if (in_array($value, ['no', 'off', 'false', 0, '0', 'n', 'null', null], true)) {
     return false;
   }
 
