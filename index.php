@@ -39,17 +39,17 @@ class Generator {
       }
     }
 
-    $files = array_map(function($file) use ($path) {
-      return str_replace($path, '', $file);
-    }, glob("${path}/*/index.php"));
-
-    $files = array_merge($files, array_filter(array_map(function($file) use ($path) {
+    $files = array_filter(array_map(function($file) use ($path) {
       if (basename($file) === 'index.php') {
         return;
       }
 
       return str_replace($path, '', $file);
-    }, glob("${path}/*.php"))));
+    }, glob("${path}/*.php")));
+
+    $files = array_merge($files, array_map(function($file) use ($path) {
+      return str_replace($path, '', $file);
+    }, glob("${path}/*/index.php")));
 
     printLine("${path}:");
     echo "|- ".implode("\n|- ", $files)."\n";
