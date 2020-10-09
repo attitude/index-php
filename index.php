@@ -32,6 +32,15 @@ class Generator {
     return !!$this->config['backup'];
   }
 
+  private function printStructure(string $path, array $files) {
+    printLine("${path}:");
+    $filesCount = count($files);
+
+    foreach ($files as $index => $file) {
+      printLine(($index + 1 < $filesCount ? "├- " : "└- ").$file);
+    }
+  }
+
   private function walk(string $path) {
     if ($this->isRecursive()) {
       foreach (glob("${path}/*", GLOB_ONLYDIR) as $dir) {
@@ -51,8 +60,7 @@ class Generator {
       return str_replace($path, '', $file);
     }, glob("${path}/*/index.php")));
 
-    printLine("${path}:");
-    echo "|- ".implode("\n|- ", $files)."\n";
+    $this->printStructure($path, $files);
 
     $indexContent =
       "<?php\n".
@@ -83,13 +91,17 @@ class Generator {
       return;
     }
 
-    if ($this->createBackup() && file_exists($destination)) {
+    $fileExists = file_exists($destination);
+
+    if ($this->createBackup() && $fileExists) {
       rename($destination, $destination.'.'.time().'.bkp');
     }
 
     if (!file_put_contents($destination, trim($newContent."\n\n".DO_NOT_EDIT_DIVIDER."\n\n".trim($rest)."\n")."\n")) {
       exitWithErrorMessage("Failed to write index file: ${destination}");
     }
+
+    printLine($fileExists ? "💫 Updated\n" : "✨ Created\n");
   }
 
   public function run() {
