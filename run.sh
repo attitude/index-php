@@ -4,6 +4,8 @@
 $config = [
   'backup' => true,
   'dry' => false,
+  'exclude' => null,
+  'include' => null,
   'path' => null,
   'recursive' => true,
 ];
@@ -28,6 +30,16 @@ $argumentsConfig = [
     'name' => 'recursive',
     'description' => 'Walk directories recursively.',
     'type' => 'boolean',
+  ],
+  'e' => [
+    'name' => 'exclude',
+    'description' => 'Regex pattern to exclude files.',
+    'type' => 'string',
+  ],
+  'i' => [
+    'name' => 'include',
+    'description' => 'Regex pattern to include files.',
+    'type' => 'string',
   ],
 ];
 

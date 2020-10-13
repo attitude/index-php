@@ -8,6 +8,8 @@ class Generator {
   private $config = [
     'backup' => false,
     'dry' => true,
+    'exclude' => null,
+    'include' => null,
     'path' => null,
     'recursive' => false,
   ];
@@ -49,7 +51,17 @@ class Generator {
     }
 
     $files = array_filter(array_map(function($file) use ($path) {
-      if (basename($file) === 'index.php') {
+      $basename = basename($file);
+
+      if ($basename === 'index.php') {
+        return;
+      }
+
+      if ($this->config['exclude'] && preg_match('/'.trim($this->config['exclude'], '/').'/', $basename)) {
+        return;
+      }
+
+      if ($this->config['include'] && !preg_match('/'.trim($this->config['include'], '/').'/', $basename)) {
         return;
       }
 
