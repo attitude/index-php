@@ -50,40 +50,47 @@ class Generator {
       }
     }
 
-    $files = array_filter(array_map(function($file) use ($path) {
-      $basename = basename($file);
+    $files = glob("${path}/*.php");
 
-      if ($basename === 'index.php') {
-        return;
+    if (count($files) > 0) {
+      $files = array_filter(array_map(function($file) use ($path) {
+        $basename = basename($file);
+
+        if ($basename === 'index.php') {
+          return;
+        }
+
+        if ($this->config['exclude'] && preg_match('/'.trim($this->config['exclude'], '/').'/', $basename)) {
+          return;
+        }
+
+        if ($this->config['include'] && !preg_match('/'.trim($this->config['include'], '/').'/', $basename)) {
+          return;
+        }
+
+        return str_replace($path, '', $file);
+      }, $files));
+
+      $files = array_merge($files, array_map(function($file) use ($path) {
+        return str_replace($path, '', $file);
+      }, glob("${path}/*/index.php")));
+
+      $this->printStructure($path, $files);
+
+      $indexContent =
+        "<?php\n".
+        "// This list of required files was automatically generated:\n".
+        "\n".
+        implode("\n", array_map(function($file) { return "require_once(__DIR__.'${file}');"; }, $files));
+
+      if (!$this->isDryRun()) {
+        $destination = $path.'/index.php';
+
+        $this->maybeReplaceFileContent($destination, $indexContent);
       }
-
-      if ($this->config['exclude'] && preg_match('/'.trim($this->config['exclude'], '/').'/', $basename)) {
-        return;
-      }
-
-      if ($this->config['include'] && !preg_match('/'.trim($this->config['include'], '/').'/', $basename)) {
-        return;
-      }
-
-      return str_replace($path, '', $file);
-    }, glob("${path}/*.php")));
-
-    $files = array_merge($files, array_map(function($file) use ($path) {
-      return str_replace($path, '', $file);
-    }, glob("${path}/*/index.php")));
-
-    $this->printStructure($path, $files);
-
-    $indexContent =
-      "<?php\n".
-      "// This list of required files was automatically generated:\n".
-      "\n".
-      implode("\n", array_map(function($file) { return "require_once(__DIR__.'${file}');"; }, $files));
-
-    if (!$this->isDryRun()) {
-      $destination = $path.'/index.php';
-
-      $this->maybeReplaceFileContent($destination, $indexContent);
+    } else {
+      printLine("${path}:");
+      printLine("👻 No files\n");
     }
   }
 
